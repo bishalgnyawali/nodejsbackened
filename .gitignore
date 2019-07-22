@@ -1,5 +1,7 @@
 /node_modules
+
 /sathi-client
+
 .env
 server.key
 server.cert
