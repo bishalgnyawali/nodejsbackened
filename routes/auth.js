@@ -68,24 +68,32 @@ router.post('/login',async(req,res)=>{
                         //connection.end();
                         sql= "SELECT password FROM user WHERE user_id="+"'"+user_id+"'";
                         
-                        connection.query(sql, function (error, result,fields) {//look for given username password
+                        connection.query(sql, async function (error, result,fields) {//look for given username password
                             if(error) console.log(error);
 
                             if(result.length>0){
                                 
-                                bcrypt.compare(password, result[0].password, function(err, b_res) {
+                                await bcrypt.compare(password, result[0].password, function(err, b_res) {
                                     // res == true
                                         if(b_res){//if password and username matches
                                             //res.json(result);
                                             console.log('verified');
                                             const token=jwt.sign({user_id: user_id},process.env.TOKEN_SECRET);
-                                            res.header('auth-token',token).send(token);
+                                            
+                                                res.json({
+                                                    type: true,
+                                                    token: token
+                                                }); 
+                                            //res.header('auth-token',token).send(token);
                                             //console.log(token);
                                             
                                         }
                                         else{//user password do not match
-                                            res.json("message:not verified");
-                                            console.log(result);//if password donot match
+                                            res.json({
+                                                type: true,
+                                                token: "invalid"
+                                            }); 
+                                            console.log('password not verified');//if password donot match
                                             return;
                                         }
                                     
@@ -99,14 +107,20 @@ router.post('/login',async(req,res)=>{
                         //connection.destroy();
                     }
                     else{//username not found
-                        res.json("message: no user");
+                        res.json({
+                            type: true,
+                            token: "invalid"
+                        }); 
                         console.log("User doesnot exist");
                     }
 
                 }
                 else{
-                    res.send(result);
-                    console.log(result);
+                    res.json({
+                        type: true,
+                        token: "invalid"
+                    }); 
+                    console.log('User name wrong');
                 }
                 
             }).on('error', function(err) {
