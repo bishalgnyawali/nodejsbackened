@@ -1,0 +1,4 @@
+create database sathi;
+show databases;
+use sathi;
+create table user(user_id VARCHAR(30) PRIMARY KEY,password VARCHAR(255) NOT NULL);
